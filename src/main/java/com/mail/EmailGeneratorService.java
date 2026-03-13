@@ -7,50 +7,67 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 public class EmailGeneratorService {
 
-    private final WebClient webClienf;
+    private final WebClient webClient;
     private final String apiKey;
 
-    public EmailGeneratorService(WebClient.Builder() webClientBuilder,
-        @Value()  String apiKey,   WebClient webClienf) {
-        this.webClienf = webClienf;
-        this.apiKey = apiKey;
+    public EmailGeneratorService(
+            WebClient.Builder webClientBuilder,
+            @Value("${gemini.api.url}") String baseUrl,
+            @Value("${gemini.api.key}") String geminiApiKey) {
+
+        this.apiKey = geminiApiKey;
+        this.webClient = webClientBuilder.baseUrl(baseUrl).build();
     }
 
-    //it take email request object
-    public static String generateEmailReply(EmailRequest emailRequest) {
-        //Build Prompt
+    // Generate Email Reply
+    public String generateEmailReply(EmailRequest emailRequest) {
+
         String prompt = buildPrompt(emailRequest);
 
-
-        // Prepare raw JSON body
+        // JSON body for Gemini
         String requestBody = String.format("""
-{
-    "contents": [
         {
-            "parts": [
+          "contents": [
+            {
+              "parts": [
                 {
-                    "text": "%s"
+                  "text": "%s"
                 }
-            ]
+              ]
+            }
+          ]
         }
-    ]
-}
-""",prompt);
+        """, prompt);
 
-        //send request
+        // Send request to Gemini API
+        String response = webClient.post()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/v1beta/models/gemini-3-flash-preview:generateContent")
+                        .queryParam("key", apiKey)
+                        .build())
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
 
-        //Extract Response
+        return response;
     }
 
-    private static String buildPrompt(EmailRequest emailRequest) {
-        //we use string builder because we can modify this prompt we can't modify string
+    // Build prompt
+    private String buildPrompt(EmailRequest emailRequest) {
+
         StringBuilder prompt = new StringBuilder();
-        prompt.append("Generate a professional reply for the following email : ");
-        if(emailRequest.getTone() != null && !emailRequest.getTone().isEmpty()){
-            prompt.append("Use a ").append(emailRequest.getTone()).append(" tone.  ");
-            //use a casual tone.
+
+        prompt.append("Generate a professional reply for the following email.\n");
+
+        if (emailRequest.getTone() != null && !emailRequest.getTone().isEmpty()) {
+            prompt.append("Use a ")
+                    .append(emailRequest.getTone())
+                    .append(" tone.\n");
         }
-        prompt.append("Original Email: \n").append(emailRequest.getEmailContent());
+
+        prompt.append("Original Email:\n")
+                .append(emailRequest.getEmailContent());
 
         return prompt.toString();
     }
