@@ -1,56 +1,102 @@
 package com.mail;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class EmailGeneratorService {
 
-    private final WebClient webClienf;
+    private final WebClient webClient;
     private final String apiKey;
 
-    public EmailGeneratorService(WebClient.Builder() webClientBuilder,
-        @Value()  String apiKey,   WebClient webClienf) {
-        this.webClienf = webClienf;
-        this.apiKey = apiKey;
+    public EmailGeneratorService(
+            WebClient.Builder webClientBuilder,
+            @Value("${gemini.api.url}") String baseUrl,
+            @Value("${gemini.api.key}") String geminiApiKey) {
+
+        this.apiKey = geminiApiKey;
+        this.webClient = webClientBuilder.baseUrl(baseUrl).build();
     }
 
-    //it take email request object
-    public static String generateEmailReply(EmailRequest emailRequest) {
-        //Build Prompt
+    // Generate Email Reply
+    public String generateEmailReply(EmailRequest emailRequest) {
+
         String prompt = buildPrompt(emailRequest);
 
-
-        // Prepare raw JSON body
         String requestBody = String.format("""
-{
-    "contents": [
         {
-            "parts": [
+          "contents": [
+            {
+              "parts": [
                 {
-                    "text": "%s"
+                  "text": "%s"
                 }
-            ]
+              ]
+            }
+          ]
         }
-    ]
-}
-""",prompt);
+        """, prompt);
 
-        //send request
+        String response = webClient.post()
+                .uri("/v1beta/models/gemini-3-flash-preview:generateContent")
+                .header("x-goog-api-key", apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
 
-        //Extract Response
+
+        return extractResponseContent(response);
     }
 
-    private static String buildPrompt(EmailRequest emailRequest) {
-        //we use string builder because we can modify this prompt we can't modify string
-        StringBuilder prompt = new StringBuilder();
-        prompt.append("Generate a professional reply for the following email : ");
-        if(emailRequest.getTone() != null && !emailRequest.getTone().isEmpty()){
-            prompt.append("Use a ").append(emailRequest.getTone()).append(" tone.  ");
-            //use a casual tone.
+    private String extractResponseContent(String response) {
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response);
+
+            JsonNode candidates = root.path("candidates");
+
+            if (candidates.isEmpty()) {
+                return "No response from Gemini API";
+            }
+
+            return candidates
+                    .get(0)
+                    .path("content")
+                    .path("parts")
+                    .get(0)
+                    .path("text")
+                    .asText();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error parsing response";
         }
-        prompt.append("Original Email: \n").append(emailRequest.getEmailContent());
+    }
+
+
+    // Build prompt
+    private String buildPrompt(EmailRequest emailRequest) {
+
+        StringBuilder prompt = new StringBuilder();
+
+        prompt.append("Generate a professional email reply for the following email.\n");
+
+        if (emailRequest.getTone() != null && !emailRequest.getTone().isEmpty()) {
+            prompt.append("Use a ")
+                    .append(emailRequest.getTone())
+                    .append(" tone.\n");
+        }
+
+        prompt.append("Original Email:\n")
+                .append(emailRequest.getEmailContent());
 
         return prompt.toString();
     }
