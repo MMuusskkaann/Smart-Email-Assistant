@@ -8,12 +8,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.3</version>
+		<version>3.3.2</version>
 		<relativePath/>
 	</parent>
 
 	<groupId>com.mail</groupId>
-	<artifactId>Smart-Email-Assistent</artifactId>
+	<artifactId>Smart-Email-Assistant</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Smart Email Assistant</name>
 	<description>Smart Email Generator using Gemini API</description>
@@ -24,13 +24,13 @@
 
 	<dependencies>
 
-		<!-- REST API (Controller) -->
+		<!-- Spring Boot Web (REST API) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- WebClient (IMPORTANT for Gemini API call) -->
+		<!-- WebClient (Reactive client for API calls) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
@@ -42,11 +42,11 @@
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
-		<!-- Lombok (optional) -->
+		<!-- Lombok (optional, for reducing boilerplate) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.30</version>
+			<version>1.18.34</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -62,7 +62,7 @@
 	<build>
 		<plugins>
 
-			<!-- Compiler (for Lombok) -->
+			<!-- Compiler plugin (annotation processing for Lombok) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -71,13 +71,13 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-							<version>1.18.30</version>
+							<version>1.18.34</version>
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 
-			<!-- Spring Boot plugin -->
+			<!-- Spring Boot Maven plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
