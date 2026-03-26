@@ -1,36 +1,22 @@
-<<<<<<< HEAD
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
- https://maven.apache.org/xsd/maven-4.0.0.xsd">
-=======
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
->>>>>>> 6e8489e (Your feature edits)
 
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-<<<<<<< HEAD
 		<version>3.3.2</version>
-=======
-		<version>4.0.3</version>
 		<relativePath/>
->>>>>>> 6e8489e (Your feature edits)
 	</parent>
 
 	<groupId>com.mail</groupId>
-	<artifactId>Smart-Email-Assistent</artifactId>
+	<artifactId>Smart-Email-Assistant</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-<<<<<<< HEAD
-=======
 	<name>Smart Email Assistant</name>
 	<description>Smart Email Generator using Gemini API</description>
->>>>>>> 6e8489e (Your feature edits)
 
 	<properties>
 		<java.version>21</java.version>
@@ -38,47 +24,30 @@
 
 	<dependencies>
 
-<<<<<<< HEAD
-		<!-- Spring Boot Web -->
-=======
-		<!-- REST API (Controller) -->
->>>>>>> 6e8489e (Your feature edits)
+		<!-- Spring Boot Web (REST API) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-<<<<<<< HEAD
-		<!-- WebClient (Reactive client) -->
-=======
-		<!-- WebClient (IMPORTANT for Gemini API call) -->
->>>>>>> 6e8489e (Your feature edits)
+		<!-- WebClient (Reactive client for API calls) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 
-<<<<<<< HEAD
-		<!-- Lombok -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.34</version>
-			<optional>true</optional>
-=======
 		<!-- Jackson (JSON parsing) -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
 
-		<!-- Lombok (optional) -->
+		<!-- Lombok (optional, for reducing boilerplate) -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.30</version>
+			<version>1.18.34</version>
 			<scope>provided</scope>
->>>>>>> 6e8489e (Your feature edits)
 		</dependency>
 
 		<!-- Testing -->
@@ -93,10 +62,7 @@
 	<build>
 		<plugins>
 
-<<<<<<< HEAD
-=======
-			<!-- Compiler (for Lombok) -->
->>>>>>> 6e8489e (Your feature edits)
+			<!-- Compiler plugin (annotation processing for Lombok) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -105,20 +71,13 @@
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
-<<<<<<< HEAD
 							<version>1.18.34</version>
-=======
-							<version>1.18.30</version>
->>>>>>> 6e8489e (Your feature edits)
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 
-<<<<<<< HEAD
-=======
-			<!-- Spring Boot plugin -->
->>>>>>> 6e8489e (Your feature edits)
+			<!-- Spring Boot Maven plugin -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
