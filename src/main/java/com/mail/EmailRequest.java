@@ -1,5 +1,9 @@
 package com.mail;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
 public class EmailRequest {
 
     private String emailContent;
