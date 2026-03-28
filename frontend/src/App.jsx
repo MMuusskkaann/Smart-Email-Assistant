@@ -1,4 +1,4 @@
-// Importing required MUI components for UI
+import toast, { Toaster } from "react-hot-toast";
 import {
   Box,
   Container,
@@ -10,128 +10,164 @@ import {
   MenuItem,
   Button,
   CircularProgress,
+  IconButton,
 } from "@mui/material";
 
-import "./App.css";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { Brightness4, Brightness7 } from "@mui/icons-material";
+
 import { useState } from "react";
-import axios from "axios"; // for making API calls
+import axios from "axios";
 
 function App() {
-  // 🔹 State to store user input (original email)
   const [emailContent, setEmailContent] = useState("");
-
-  // 🔹 State to store selected tone
   const [tone, setTone] = useState("");
-
-  // 🔹 State to store generated reply from backend
   const [generatedReply, setGeneratedReply] = useState("");
-
-  // 🔹 State to handle loading spinner
   const [loading, setLoading] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
 
-  // 🔹 Function to call backend API
+  // 🌙 Theme setup
+  const theme = createTheme({
+    palette: {
+      mode: darkMode ? "dark" : "light",
+      primary: {
+        main: "#667eea",
+      },
+    },
+    shape: {
+      borderRadius: 12,
+    },
+  });
+
   const handleSubmit = async () => {
-    // If email content is empty, don't call API
     if (!emailContent) return;
 
-    setLoading(true); // Start loading
+    setLoading(true);
 
     try {
-      // Making POST request to backend API
       const response = await axios.post(
         "http://localhost:8080/api/email/generator",
         {
-          emailContent, // sending email content
-          tone, // sending tone
+          emailContent,
+          tone,
         }
       );
 
-      // Handling response (string or object)
       setGeneratedReply(
         typeof response.data === "string"
           ? response.data
           : JSON.stringify(response.data)
       );
     } catch (error) {
-      // Error handling
-      console.error("Error:", error);
       setGeneratedReply("Something went wrong. Please try again.");
     } finally {
-      // Stop loading in both success & failure
       setLoading(false);
     }
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      {/* 🔹 Heading */}
-      <Typography variant="h3" gutterBottom>
-        Email Reply Generator
-      </Typography>
-
-      {/* 🔹 Input Section */}
-      <Box sx={{ mx: 3 }}>
-        {/* Email Input Field */}
-        <TextField
-          fullWidth
-          multiline
-          rows={6}
-          label="Original Email Content"
-          value={emailContent}
-          onChange={(e) => setEmailContent(e.target.value)}
-          sx={{ mb: 2 }}
-        />
-
-        {/* Tone Selection Dropdown */}
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel>Tone</InputLabel>
-          <Select
-            value={tone}
-            label="Tone"
-            onChange={(e) => setTone(e.target.value)}
+    <ThemeProvider theme={theme}>
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: darkMode
+            ? "linear-gradient(135deg, #1e1e2f, #121212)"
+            : "linear-gradient(135deg, #667eea, #764ba2)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "0.3s",
+        }}
+      >
+        <Container maxWidth="sm">
+          <Box
+            sx={{
+              p: 4,
+              borderRadius: 4,
+              background: darkMode
+                ? "rgba(30,30,30,0.9)"
+                : "rgba(255,255,255,0.9)",
+              backdropFilter: "blur(10px)",
+              boxShadow: "0 15px 40px rgba(0,0,0,0.2)",
+            }}
           >
-            <MenuItem value="">None</MenuItem>
-            <MenuItem value="Professional">Professional</MenuItem>
-            <MenuItem value="Casual">Casual</MenuItem>
-            <MenuItem value="Friendly">Friendly</MenuItem>
-          </Select>
-        </FormControl>
+            {/* Top Bar */}
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+              <Typography variant="h5" fontWeight="bold">
+                Email Reply Generator
+              </Typography>
 
-        {/* Generate Button */}
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={!emailContent || loading} // disable if empty or loading
-          sx={{ mb: 2 }}
-        >
-          {/* Show loader when API is calling */}
-          {loading ? <CircularProgress size={24} /> : "Generate Reply"}
-        </Button>
+              <IconButton onClick={() => setDarkMode(!darkMode)}>
+                {darkMode ? <Brightness7 /> : <Brightness4 />}
+              </IconButton>
+            </Box>
+
+            {/* Input */}
+            <TextField
+              fullWidth
+              multiline
+              rows={5}
+              label="Original Email Content"
+              value={emailContent}
+              onChange={(e) => setEmailContent(e.target.value)}
+              sx={{ mt: 3, mb: 2 }}
+            />
+
+            {/* Tone */}
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Tone</InputLabel>
+              <Select
+                value={tone}
+                label="Tone"
+                onChange={(e) => setTone(e.target.value)}
+              >
+                <MenuItem value="">None</MenuItem>
+                <MenuItem value="Professional">Professional</MenuItem>
+                <MenuItem value="Casual">Casual</MenuItem>
+                <MenuItem value="Friendly">Friendly</MenuItem>
+              </Select>
+            </FormControl>
+
+            {/* Button */}
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={!emailContent || loading}
+              sx={{
+                py: 1.5,
+                fontWeight: "bold",
+                mb: 2,
+                background: "linear-gradient(135deg, #667eea, #764ba2)",
+              }}
+            >
+              {loading ? <CircularProgress size={24} /> : "Generate Reply"}
+            </Button>
+
+            {/* Output */}
+            <TextField
+              fullWidth
+              multiline
+              rows={5}
+              value={generatedReply}
+              InputProps={{ readOnly: true }}
+              placeholder="Generated reply will appear here..."
+              sx={{ mb: 2 }}
+            />
+
+            {/* Copy */}
+            <Button
+              fullWidth
+              variant="outlined"
+              onClick={() => navigator.clipboard.writeText(generatedReply)}
+              disabled={!generatedReply}
+            >
+              Copy to Clipboard
+            </Button>
+          </Box>
+        </Container>
       </Box>
-
-      {/* 🔹 Output Section */}
-      <Box sx={{ mx: 3 }}>
-        {/* Generated Reply Field */}
-        <TextField
-          fullWidth
-          multiline
-          rows={6}
-          value={generatedReply}
-          InputProps={{ readOnly: true }} // make it read-only
-          placeholder="Generated reply will appear here..."
-          sx={{ mb: 2 }}
-        />
-
-        {/* Copy Button */}
-        <Button
-          variant="outlined"
-          onClick={() => navigator.clipboard.writeText(generatedReply)}
-          disabled={!generatedReply} // disable if no text
-        >
-          Copy to Clipboard
-        </Button>
-      </Box>
-    </Container>
+    </ThemeProvider>
   );
 }
 
