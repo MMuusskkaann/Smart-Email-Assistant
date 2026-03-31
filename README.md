@@ -1,4 +1,4 @@
-# 🚀 Smart Email Assistant (Chrome Extension + Full Stack)
+# 🚀 Smart Email Assistant (Chrome Extension)
 
 **Smart Email Assistant** is an AI-powered email generation system that helps users draft professional emails instantly. The project combines a **full-stack web application** with a **Chrome Extension** to enable real-time email generation directly inside Gmail.
 
